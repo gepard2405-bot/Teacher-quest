@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Квест для Александра Ивановича</title>
+<style>
+:root{
+  --bg:#0b1020; --card:#121a30; --card2:#18223d; --text:#eef3ff;
+  --muted:#9eabd0; --accent:#72e6c1; --accent2:#8ea8ff; --danger:#ff7d91;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; min-height:100vh; font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;
+  background:radial-gradient(circle at 20% 10%,#202b58 0,#0b1020 42%,#070b16 100%);
+  color:var(--text); display:flex; align-items:center; justify-content:center; padding:24px;
+}
+.app{width:min(820px,100%)}
+.card{
+  background:rgba(18,26,48,.94); border:1px solid #293657; border-radius:28px;
+  padding:34px; box-shadow:0 20px 70px rgba(0,0,0,.35); backdrop-filter:blur(10px);
+}
+.hidden{display:none}
+.badge{
+  display:inline-flex; padding:7px 12px; border-radius:999px; background:#203053;
+  color:var(--accent); font-size:13px; font-weight:700; letter-spacing:.04em;
+}
+h1{font-size:clamp(32px,6vw,58px); line-height:1.03; margin:18px 0 12px}
+h2{font-size:30px; margin:14px 0}
+p{color:var(--muted); font-size:17px; line-height:1.65}
+.hero{font-size:64px}
+.btn{
+  border:0; border-radius:15px; padding:14px 20px; font-size:16px; font-weight:800;
+  cursor:pointer; background:var(--accent); color:#071511; transition:.2s;
+}
+.btn:hover{transform:translateY(-2px); filter:brightness(1.05)}
+.btn.secondary{background:#253252;color:var(--text)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+.progress{height:8px;background:#202b47;border-radius:99px;overflow:hidden;margin:8px 0 26px}
+.bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:.4s}
+.meta{display:flex;justify-content:space-between;color:var(--muted);font-size:14px}
+.code{
+  background:#080d19;border:1px solid #293657;border-radius:15px;padding:18px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:16px;line-height:1.7;
+  color:#dce6ff; white-space:pre-wrap;
+}
+.options{display:grid;gap:12px;margin-top:20px}
+.option{
+  width:100%;text-align:left;padding:16px 18px;border-radius:15px;border:1px solid #344364;
+  background:#17213a;color:var(--text);font-size:16px;cursor:pointer;transition:.18s;
+}
+.option:hover{border-color:var(--accent2);background:#1b2948}
+.option.correct{border-color:var(--accent);background:#123b35}
+.option.wrong{border-color:var(--danger);background:#3b1824}
+.feedback{min-height:28px;margin-top:16px;font-weight:700}
+.final{
+  text-align:center; background:
+  radial-gradient(circle at 50% 0,#263866 0,rgba(18,26,48,.96) 45%);
+}
+.final .message{
+  margin:26px auto 0; max-width:680px; padding:24px; border-radius:20px;
+  background:rgba(7,12,25,.55); border:1px solid #344364; font-size:19px; line-height:1.75;
+}
+.heart{font-size:50px;animation:pulse 1.5s infinite}
+@keyframes pulse{50%{transform:scale(1.08)}}
+.small{font-size:14px!important}
+</style>
+</head>
+<body>
+<div class="app">
+
+<section id="start" class="card">
+  <div class="hero">💻✨</div>
+  <span class="badge">СЕКРЕТНЫЙ КВЕСТ</span>
+  <h1>Операция<br>«Учитель 2.0»</h1>
+  <p>Александр Иванович, система сообщает о критическом событии: сегодня нужно пройти несколько уровней, чтобы разблокировать специальное сообщение.</p>
+  <p>Не переживайте: баги предусмотрены сюжетом. А финальный экран — главный приз. 😉</p>
+  <div class="actions"><button class="btn" onclick="startGame()">Запустить квест ▶</button></div>
+</section>
+
+<section id="game" class="card hidden">
+  <div class="meta"><span id="level">Уровень 1 из 4</span><span id="score">0 XP</span></div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div id="content"></div>
+</section>
+
+<section id="final" class="card final hidden">
+  <div class="heart">🤍</div>
+  <span class="badge">ДОСТУП РАЗБЛОКИРОВАН</span>
+  <h1>С Днём учителя!</h1>
+  <div class="message">
+    Спасибо, Александр Иванович, за Ваше терпение и умение сложное делать понятным.<br>
+    За то, что не ругались, когда у меня ничего не запускалось.<br>
+    Пусть всё работает как надо, а выходных хватает на отдых без дедлайнов.<br><br>
+    <strong>С Днём учителя! 🤍</strong>
+  </div>
+  <div class="actions" style="justify-content:center">
+    <button class="btn secondary" onclick="location.reload()">Пройти ещё раз ↻</button>
+  </div>
+</section>
+
+</div>
+
+<script>
+const levels = [
+{
+ title:"Уровень 1 — Разминка",
+ text:"Компьютер получил команду: «Найди ошибку». Какой вариант больше всего похож на настоящий баг?",
+ code:"print('Hello, teacher!')",
+ options:["Программа выводит текст — всё работает.","Вместо текста появляется ошибка.","Компьютер внезапно просит чай."],
+ answer:0,
+ ok:"Верно! Первый тест пройден. Похоже, сегодня всё действительно запускается. 😎"
+},
+{
+ title:"Уровень 2 — Логика",
+ text:"Нужно выбрать правильную последовательность действий, чтобы отправить файл учителю.",
+ options:["Создать файл → сохранить → прикрепить → отправить","Отправить → создать → удалить → сохранить","Закрыть компьютер → надеяться на лучшее → отправить"],
+ answer:0,
+ ok:"Отлично! Логика на месте. Файл спасён и отправлен без фразы «ой, я не то прикрепил»."
+},
+{
+ title:"Уровень 3 — Антибаг",
+ text:"На экране появляется легендарное сообщение: «У меня ничего не запускается». Что делать первым?",
+ options:["Нажать все кнопки одновременно.","Спокойно проверить ошибку и разобраться по шагам.","Обвинить Wi‑Fi, клавиатуру и ретроградный Меркурий."],
+ answer:1,
+ ok:"Именно! Спокойствие, диагностика и немного терпения — фирменный режим хорошего учителя."
+},
+{
+ title:"Уровень 4 — Финальный алгоритм",
+ text:"Последняя задача. Какой алгоритм сегодня самый правильный?",
+ options:["Урок → дедлайн → ещё дедлайн → повторить.","Работа → работа → работа → работа.","Уроки сделаны → всё работает → отдых → никаких дедлайнов хотя бы сегодня."],
+ answer:2,
+ ok:"Система согласна. Финальный протокол активирован. Осталось открыть сообщение…"
+}
+];
+
+let current=0, score=0, locked=false;
+
+function startGame(){
+ document.getElementById('start').classList.add('hidden');
+ document.getElementById('game').classList.remove('hidden');
+ render();
+}
+function render(){
+ locked=false;
+ const l=levels[current];
+ document.getElementById('level').textContent=`Уровень ${current+1} из ${levels.length}`;
+ document.getElementById('score').textContent=`${score} XP`;
+ document.getElementById('bar').style.width=`${current/levels.length*100}%`;
+ const c=document.getElementById('content');
+ c.innerHTML=`<span class="badge">${l.title}</span><h2>${l.text}</h2>
+ ${l.code?`<div class="code">${escapeHtml(l.code)}</div>`:''}
+ <div class="options">${l.options.map((x,i)=>`<button class="option" onclick="answer(${i})">${x}</button>`).join('')}</div>
+ <div class="feedback" id="feedback"></div>`;
+}
+function answer(i){
+ if(locked)return;
+ locked=true;
+ const l=levels[current], buttons=document.querySelectorAll('.option');
+ buttons.forEach((b,n)=>{if(n===i)b.classList.add(i===l.answer?'correct':'wrong'); if(n===l.answer)b.classList.add('correct')});
+ const f=document.getElementById('feedback');
+ if(i===l.answer){score+=100;f.textContent=l.ok;f.style.color='var(--accent)'}
+ else {f.textContent='Не страшно — даже лучший код иногда падает. Попробуйте ещё раз.';f.style.color='var(--danger)';locked=false;return}
+ const next=document.createElement('button'); next.className='btn'; next.style.marginTop='16px';
+ next.textContent=current===levels.length-1?'Открыть финал ✨':'Следующий уровень →';
+ next.onclick=()=>{current++; if(current<levels.length)render();else finish()};
+ f.appendChild(document.createElement('br'));f.appendChild(next);
+}
+function finish(){
+ document.getElementById('game').classList.add('hidden');
+ document.getElementById('final').classList.remove('hidden');
+}
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+</script>
+</body>
+</html>
